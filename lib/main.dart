@@ -16,15 +16,9 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   final List<Transaction> transactins = [
     Transaction(
-        id: 't1', 
-        title: 'New Shoes', 
-        amount: 69.99, 
-        date: DateTime.now()),
+        id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
     Transaction(
-        id: 't2',
-        title: 'Weeklyt Grocery',
-        amount: 16.53,
-        date: DateTime.now()),
+        id: 't2', title: 'Weekly Grocery', amount: 16.53, date: DateTime.now()),
   ];
 
   @override
@@ -34,7 +28,7 @@ class MyHomePage extends StatelessWidget {
           title: Text('Flutter App'),
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
@@ -45,8 +39,45 @@ class MyHomePage extends StatelessWidget {
                 elevation: 5,
               ),
             ),
-            Card(
-              child: Text('LIST OF TX'),
+            Column(
+              children: transactins.map((trans) {
+                return Card(
+                  elevation: 6,
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        margin:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.purple, width: 3)),
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          '\$${trans.amount}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.purple,
+                          ),
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            trans.title.toString(),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            trans.date.toString(),
+                            style: TextStyle(color: Colors.grey),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ));
