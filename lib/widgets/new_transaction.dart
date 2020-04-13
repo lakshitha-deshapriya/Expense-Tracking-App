@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 
-class NewTransaction extends StatelessWidget {
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+class NewTransaction extends StatefulWidget {
   final Function addTrans;
 
   NewTransaction(this.addTrans);
 
+  @override
+  _NewTransactionState createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+  final titleController = TextEditingController();
+
+  final amountController = TextEditingController();
+
   void addNewTransaction() {
     if (titleController.text.isEmpty ||
         double.parse(amountController.text) <= 0) {
-          print('came');
       return;
     }
-    addTrans(titleController.text, double.parse(amountController.text));
+    widget.addTrans(titleController.text, double.parse(amountController.text));
+
+    Navigator.of(context).pop();
   }
 
-  //numbwe is not working for ios. Need to use numberWithOptions(decomal:true)
   @override
   Widget build(BuildContext context) {
     return Card(
