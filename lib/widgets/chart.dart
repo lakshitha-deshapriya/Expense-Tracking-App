@@ -39,9 +39,10 @@ class Chart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 6,
-      margin: EdgeInsets.all(20),
+      elevation: 10,
+      margin: EdgeInsets.all(10),
       child: Container(
+        color: Color.fromRGBO(250, 250, 250, 1),
         padding: EdgeInsets.all(7),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
