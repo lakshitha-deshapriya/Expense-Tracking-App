@@ -1,3 +1,5 @@
+import 'package:expense_app/widgets/chart.dart';
+
 import './models/transaction.dart';
 import './widgets/new_transaction.dart';
 import './widgets/transaction_list.dart';
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           primarySwatch: Colors.purple,
           accentColor: Colors.amber,
-          fontFamily: 'Quicksand',  
+          fontFamily: 'Quicksand',
           textTheme: ThemeData.light().textTheme.copyWith(
               title: TextStyle(
                   fontFamily: 'OpenSans',
@@ -43,6 +45,14 @@ class _MyHomePageState extends State<MyHomePage> {
     // Transaction(
     //     id: 't2', title: 'Weekly Grocery', amount: 16.53, date: DateTime.now()),
   ];
+
+  List<Transaction> get _recentTransactions {
+    return _transactions.where((trans) {
+      return trans.date.isAfter(
+        DateTime.now().subtract(Duration(days: 7)),
+      );
+    }).toList();
+  }
 
   void _addNewTransaction(String title, double amount) {
     final newTrans = Transaction(
@@ -85,14 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              child: Card(
-                color: Colors.blue,
-                child: Text('CHART!'),
-                elevation: 5,
-              ),
-            ),
+            Chart(_recentTransactions),
             TransactionList(_transactions),
           ],
         ),
