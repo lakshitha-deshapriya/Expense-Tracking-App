@@ -1,4 +1,5 @@
 import 'package:expense_app/widgets/chart.dart';
+import 'package:flutter/services.dart';
 
 import './models/transaction.dart';
 import './widgets/new_transaction.dart';
@@ -6,7 +7,13 @@ import './widgets/transaction_list.dart';
 
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  // SystemChrome.setPreferredOrientations([  //To disable landscape mode
+  //   DeviceOrientation.portraitUp,
+  //   DeviceOrientation.portraitDown,
+  // ]);
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -42,6 +49,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [];
+
+  bool _showChart = false;
 
   List<Transaction> get _recentTransactions {
     return _transactions.where((trans) {
@@ -84,19 +93,39 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final AppBar appBar = AppBar(
-      title: Text(
-        'Personal Expenses',
+    final bool landscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final appBar = PreferredSize(
+      child: AppBar(
+        title: Text(
+          'Personal Expenses',
+        ),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () => _startAddNewTransaction(context)),
+        ],
       ),
-      actions: <Widget>[
-        IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _startAddNewTransaction(context)),
-      ],
+      preferredSize: Size(double.infinity, 35),
     );
 
-    final double availableSpace =
-        (MediaQuery.of(context).size.height - appBar.preferredSize.height -MediaQuery.of(context).padding.top);
+    final double availableSpace = (MediaQuery.of(context).size.height -
+        appBar.preferredSize.height -
+        MediaQuery.of(context).padding.top);
+
+    Widget getTransactionListContainer(double heightFactor) {
+      return Container(
+        height: availableSpace * heightFactor,
+        child: TransactionList(_transactions, _deleteTransaction),
+      );
+    }
+
+    Widget getChartContainer(double heightFactor) {
+      return Container(
+        height: (availableSpace * heightFactor),
+        child: Chart(_recentTransactions, landscape),
+      );
+    }
 
     return Scaffold(
       appBar: appBar,
@@ -104,14 +133,33 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Container(
-              height: (availableSpace * 0.3),
-              child: Chart(_recentTransactions),
-            ),
-            Container(
-              height: availableSpace * 0.7,
-              child: TransactionList(_transactions, _deleteTransaction),
-            ),
+            if (landscape)
+              Container(
+                height: availableSpace * 0.15,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      'Show Chart',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Switch(
+                        value: _showChart,
+                        onChanged: (val) {
+                          setState(() {
+                            _showChart = val;
+                          });
+                        }),
+                  ],
+                ),
+              ),
+            if (!landscape) getChartContainer(0.3),
+            if (!landscape) getTransactionListContainer(0.7),
+            if (landscape) _showChart
+                  ? getChartContainer(0.68)
+                  : getTransactionListContainer(0.85),
           ],
         ),
       ),

@@ -5,8 +5,9 @@ import 'package:intl/intl.dart';
 
 class Chart extends StatelessWidget {
   final List<Transaction> recentTransactions;
+  final bool landscape;
 
-  Chart(this.recentTransactions);
+  Chart(this.recentTransactions, this.landscape);
 
   List<Map<String, Object>> get groupTransactions {
     return List.generate(7, (index) {
@@ -40,7 +41,7 @@ class Chart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 10,
-      margin: EdgeInsets.all(20),
+      margin: !landscape ? EdgeInsets.all(20) : EdgeInsets.only(left: 20, right: 20, bottom: 20),
       child: Container(
         color: Color.fromRGBO(250, 250, 250, 1),
         padding: EdgeInsets.all(7),
