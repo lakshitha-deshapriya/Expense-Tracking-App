@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:expense_app/widgets/chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 import './models/transaction.dart';
@@ -22,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'Personal Expenses',
       theme: ThemeData(
           primarySwatch: Colors.purple,
-          accentColor: Colors.amber,
+          accentColor: Colors.greenAccent,
           fontFamily: 'Quicksand',
           textTheme: ThemeData.light().textTheme.copyWith(
                 title: TextStyle(
@@ -95,19 +98,31 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final bool landscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    final appBar = PreferredSize(
-      child: AppBar(
-        title: Text(
-          'Personal Expenses',
-        ),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => _startAddNewTransaction(context)),
-        ],
-      ),
-      preferredSize: Size(double.infinity, 35),
-    );
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: Text(
+              'Personal Expenses',
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                GestureDetector(
+                  child: Icon(CupertinoIcons.add),
+                  onTap: () => _startAddNewTransaction(context),
+                ),
+              ],
+            ),
+          )
+        : AppBar(
+            title: Text(
+              'Personal Expenses',
+            ),
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () => _startAddNewTransaction(context)),
+            ],
+          );
 
     final double availableSpace = (MediaQuery.of(context).size.height -
         appBar.preferredSize.height -
@@ -127,47 +142,60 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    return Scaffold(
-      appBar: appBar,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            if (landscape)
-              Container(
-                height: availableSpace * 0.15,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      'Show Chart',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+    Widget getPageBody() {
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              if (landscape)
+                Container(
+                  height: availableSpace * 0.15,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Show Chart',
+                        style: Theme.of(context).textTheme.title,
                       ),
-                    ),
-                    Switch(
-                        value: _showChart,
-                        onChanged: (val) {
-                          setState(() {
-                            _showChart = val;
-                          });
-                        }),
-                  ],
+                      Switch.adaptive(
+                          value: _showChart,
+                          onChanged: (val) {
+                            setState(() {
+                              _showChart = val;
+                            });
+                          }),
+                    ],
+                  ),
                 ),
-              ),
-            if (!landscape) getChartContainer(0.3),
-            if (!landscape) getTransactionListContainer(0.7),
-            if (landscape) _showChart
-                  ? getChartContainer(0.68)
-                  : getTransactionListContainer(0.85),
-          ],
+              if (!landscape) getChartContainer(0.3),
+              if (!landscape) getTransactionListContainer(0.7),
+              if (landscape)
+                _showChart
+                    ? getChartContainer(0.68)
+                    : getTransactionListContainer(0.85),
+            ],
+          ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => _startAddNewTransaction(context),
-      ),
-    );
+      );
+    }
+
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: getPageBody(),
+            navigationBar: appBar,
+          )
+        : Scaffold(
+            appBar: appBar,
+            body: getPageBody(),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: () => _startAddNewTransaction(context),
+                  ),
+          );
   }
 }
